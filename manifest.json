@@ -1,0 +1,16 @@
+{
+  "name": "Старший курьер",
+  "short_name": "Ст. курьер",
+  "description": "Ведение смены старшего курьера: техника, батареи, зона, нарушения, инструктажи и отчёт",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF",
+  "lang": "ru",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

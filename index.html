@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Старший курьер">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Старший курьер</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#FFFFFF;--card:#F4F4F6;--card-press:#ECECEF;--card2:#FFFFFF;--accent:#3B7FF6;--accent-soft:#EAF1FE;--accent2:#1FBF5A;--warn:#F5A623;--danger:#FA3E2C;--text:#1A1A1A;--text-sec:#9A9AA2;--text-ter:#BBBBC1;--border:#E6E6EA;--border-soft:#ECECEF;--ink:#1A1A1A;--radius:20px;--radius-sm:13px;--shadow:none;--shadow-lift:none}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter','Segoe UI',sans-serif;background:var(--bg);color:var(--text);height:100dvh;display:flex;flex-direction:column;overflow:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+#app{display:flex;flex-direction:column;height:100dvh}
+#content{flex:1;overflow-y:auto;padding:18px 16px;padding-bottom:92px;-webkit-overflow-scrolling:touch}
+.tab{display:none}.tab.active{display:block;animation:fadeUp .34s cubic-bezier(.22,1,.36,1)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.tab.active{animation:none}}
+.nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.86);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border-top:1px solid var(--border-soft);display:flex;padding:7px 6px max(7px,env(safe-area-inset-bottom));z-index:300}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:6px 0 5px;color:var(--text-sec);font-size:9.5px;font-weight:600;letter-spacing:.01em;border-radius:14px;transition:color .22s,background .22s,transform .12s}
+.nav-btn:active{transform:scale(.92)}
+.nav-btn.active{color:var(--ink)}
+.nav-btn svg{width:23px;height:23px;stroke-width:2;transition:transform .22s,stroke-width .22s}
+.nav-btn.active svg{stroke-width:2.6;transform:translateY(-1px)}
+.page-title{font-size:30px;font-weight:800;margin-bottom:18px;letter-spacing:-.9px}
+.section-label{font-size:11.5px;font-weight:700;color:var(--text-ter);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px}
+.version-row{display:flex;align-items:center;gap:8px;margin-bottom:18px}
+.version-badge{background:var(--accent-soft);border:none;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:var(--accent)}
+.changelog-btn{background:none;border:none;font-size:13px;font-weight:600;color:var(--accent);cursor:pointer;padding:4px 8px}
+.card{background:var(--card);border:none;border-radius:var(--radius);padding:18px;margin-bottom:12px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-card{background:var(--card);border:none;border-radius:var(--radius);padding:18px 18px 16px;text-align:left;transition:background .15s,transform .14s}
+.stat-card:active{transform:scale(.98);background:var(--card-press)}
+.stat-val{font-size:34px;font-weight:800;color:var(--text);letter-spacing:-1.2px;line-height:1}
+.stat-lbl{font-size:13px;color:var(--text-sec);margin-top:6px;font-weight:600}
+.btn{width:100%;padding:16px;border:none;border-radius:16px;font-size:16px;font-weight:700;cursor:pointer;transition:transform .12s,filter .15s;letter-spacing:-.02em}
+.btn:active{transform:scale(.975);filter:brightness(.96)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-success{background:var(--accent2);color:#fff}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-warn{background:var(--warn);color:#fff}
+.btn-outline{background:var(--card);border:none;color:var(--text)}
+.btn-sm{padding:11px 18px;font-size:14px;width:auto;border-radius:13px}
+input,select,textarea{width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:16px;background:var(--card2);color:var(--text);outline:none;transition:border-color .18s,background .18s,box-shadow .18s;font-family:inherit}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);background:var(--card);box-shadow:0 0 0 3.5px var(--accent-soft)}
+input::placeholder,textarea::placeholder{color:var(--text-ter)}
+textarea{resize:none;min-height:76px}
+.form-row{margin-bottom:12px}
+.form-label{font-size:13px;color:var(--text-sec);margin-bottom:5px;display:block;font-weight:500}
+.form-2col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.status-badge{display:inline-block;padding:5px 12px;border-radius:9px;font-size:12px;font-weight:700;letter-spacing:-.01em}
+.badge-ok{background:#E3F8EC;color:#127A3E}
+.badge-warn{background:#FEF1D7;color:#9A6209}
+.badge-fix{background:#FDE6E4;color:#B42318}
+.record-item{background:var(--card);border:none;border-radius:var(--radius);padding:16px;margin-bottom:10px;animation:fadeUp .28s cubic-bezier(.22,1,.36,1)}
+.record-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px;gap:10px}
+.record-id{font-weight:700;font-size:15px;letter-spacing:-.2px}
+.record-time{font-size:12px;color:var(--text-ter);font-weight:600;white-space:nowrap;flex-shrink:0}
+.record-comment{font-size:13.5px;color:var(--text-sec);margin-top:8px;line-height:1.5}
+.record-actions{display:flex;gap:7px;margin-top:13px;flex-wrap:wrap}
+.action-btn{padding:8px 14px;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:transform .12s}
+.action-btn:active{transform:scale(.94)}
+.action-edit{background:#EFF6FF;color:#1D4ED8}
+.action-del{background:#FEF2F2;color:#DC2626}
+.action-copy{background:#F0FDF4;color:#15803D}
+.empty-state{text-align:center;padding:48px 20px;color:var(--text-sec)}
+.empty-icon{font-size:44px;margin-bottom:10px}
+.empty-state p{font-size:15px}
+.check-item{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--border-soft);cursor:pointer;user-select:none;transition:opacity .12s}
+.check-item:last-child{border-bottom:none}
+.check-item:active{opacity:.6}
+.check-box{width:26px;height:26px;border-radius:8px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s cubic-bezier(.22,1,.36,1)}
+.check-item.checked .check-box{background:var(--accent2);border-color:var(--accent2);transform:scale(1.04)}
+.check-item.checked .check-box::after{content:"✓";font-size:14px;font-weight:800;color:#fff}
+.check-text{font-size:15px;font-weight:560;transition:color .15s}
+.check-item.checked .check-text{color:var(--text-sec)}
+.battery-card{background:var(--card);border:none;border-radius:var(--radius);padding:16px;margin-bottom:10px;animation:fadeUp .28s cubic-bezier(.22,1,.36,1)}
+.battery-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.battery-num{font-weight:700;font-size:15px}
+.status-pills{display:flex;gap:7px;flex-wrap:wrap}
+.pill{padding:8px 13px;border-radius:10px;font-size:13px;font-weight:600;background:var(--card2);color:var(--text-sec);cursor:pointer;border:1.5px solid transparent;transition:all .15s}
+.pill:active{transform:scale(.95)}
+.active-ok{background:#E3F8EC;color:#127A3E;border-color:#9BE6BC}
+.active-warn{background:#FEF1D7;color:#9A6209;border-color:#FBD98A}
+.active-broken{background:#FDE6E4;color:#B42318;border-color:#F6B5AE}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:250;align-items:flex-end;justify-content:center;pointer-events:none}
+.modal.open{display:flex;pointer-events:all}
+.modal.open .modal-box{animation:slideUp .34s cubic-bezier(.22,1,.36,1)}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:none}}
+.modal-box{background:#fff;border-radius:26px 26px 0 0;padding:22px 22px max(22px,env(safe-area-inset-bottom));width:100%;max-width:520px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -8px 40px rgba(20,22,30,.18)}
+.modal-box::before{content:"";display:block;width:38px;height:4px;border-radius:99px;background:var(--border);margin:-6px auto 16px;flex-shrink:0}
+.modal-title{font-size:21px;font-weight:800;margin-bottom:14px;letter-spacing:-.5px;flex-shrink:0}
+.report-body{flex:1;overflow-y:auto;background:var(--card);border-radius:14px;padding:14px;margin-bottom:14px;min-height:0}
+.modal-btns{flex-shrink:0;display:flex;flex-direction:column;gap:10px}
+.cl-version{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;margin-top:14px}
+.cl-version:first-child{margin-top:0}
+.cl-date{font-size:12px;color:var(--text-sec);margin-bottom:8px}
+.cl-item{font-size:13px;color:var(--text);line-height:1.8;padding-left:4px}
+.cl-item::before{content:"• ";color:var(--accent)}
+.toast{position:fixed;bottom:104px;left:50%;transform:translateX(-50%);background:rgba(26,26,28,0.92);backdrop-filter:blur(8px);color:#fff;padding:12px 22px;border-radius:24px;font-size:14px;font-weight:600;z-index:400;pointer-events:none;white-space:nowrap;box-shadow:0 8px 28px rgba(0,0,0,.28);animation:toastIn .26s cubic-bezier(.22,1,.36,1)}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.divider{height:1px;background:var(--border);margin:14px 0}
+.input-row{display:flex;gap:8px}
+.input-row input{flex:1}
+.photo-section{margin-top:12px}
+.photo-label{font-size:13px;color:var(--text-sec);margin-bottom:8px;display:block;font-weight:500}
+.photo-row{display:flex;gap:8px;flex-wrap:wrap}
+.photo-slot{width:80px;height:80px;border-radius:14px;border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:var(--card2);flex-shrink:0;transition:border-color .15s,transform .12s}
+.photo-slot:active{transform:scale(.95)}
+.photo-slot img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+.photo-slot .add-icon{font-size:28px;color:var(--text-sec)}
+.photo-slot .del-photo{position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.55);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+input[type=file]{display:none}
+.an-card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.an-card .section-label{margin-bottom:12px}
+.an-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-soft)}
+.an-row:last-child{border-bottom:none;padding-bottom:0}
+.an-row:first-of-type{padding-top:0}
+.an-count{flex-shrink:0;background:var(--card2);color:var(--text-sec);border-radius:9px;padding:5px 11px;font-size:13px;font-weight:700}
+.an-count-bad{background:#FDE6E4;color:#B42318}
+.an-empty{font-size:13px;color:var(--text-sec);padding:4px 0}
+.vd{font-size:14px;line-height:1.5;padding:12px 14px;border-radius:12px;border-left:4px solid;margin-bottom:8px;background:var(--card2);font-weight:560}
+.vd:last-child{margin-bottom:0}
+.vd-bad{border-color:#FA3E2C}
+.vd-warn{border-color:#F5A623}
+.vd-ok{border-color:#1FBF5A}
+.roster-item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border-soft)}
+.roster-item:last-child{border-bottom:none;padding-bottom:0}
+.roster-info{flex:1;display:flex;align-items:center;gap:11px;cursor:pointer;min-width:0;user-select:none}
+.roster-info:active{opacity:.6}
+.present-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;background:var(--accent2)}
+.present-dot.absent{background:var(--text-ter)}
+.roster-name{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.roster-id{font-size:12px;color:var(--text-sec)}
+.roster-status{font-size:12px;font-weight:700;flex-shrink:0}
+.roster-x{background:none;border:none;color:var(--text-ter);font-size:22px;cursor:pointer;padding:0 2px;line-height:1}
+.rchip{display:inline-flex;align-items:center;padding:8px 13px;border-radius:20px;font-size:13px;font-weight:600;background:var(--card2);border:1.5px solid var(--border);color:var(--text);cursor:pointer;margin:0 6px 6px 0;transition:transform .12s}
+.rchip:active{transform:scale(.94)}
+.urgent-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:12px;background:var(--card2);border:1.5px solid var(--border);cursor:pointer;margin-bottom:12px;user-select:none;font-size:14px;font-weight:600;transition:background .15s,border-color .15s,color .15s}
+.urgent-toggle.on{background:#FDE6E4;border-color:#FA3E2C;color:#B42318}
+.ut-box{width:44px;height:26px;border-radius:20px;background:var(--border);position:relative;flex-shrink:0;transition:background .2s}
+.ut-box::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.urgent-toggle.on .ut-box{background:#FA3E2C}
+.urgent-toggle.on .ut-box::after{transform:translateX(18px)}
+.urgent-banner{background:#FDE6E4;border:1.5px solid #FA3E2C;border-radius:16px;padding:14px 16px;margin-bottom:14px;animation:fadeUp .3s cubic-bezier(.22,1,.36,1)}
+.urgent-banner-title{font-size:15px;font-weight:800;color:#B42318;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.urgent-banner-item{font-size:13px;color:#7A1610;line-height:1.55}
+.urgent-badge{display:inline-block;background:#FA3E2C;color:#fff;font-size:11px;font-weight:800;padding:3px 9px;border-radius:7px;margin-bottom:6px;letter-spacing:.03em}
+.shift-info-row{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+.shift-info-text{font-size:13px;color:var(--text-sec)}
+.shift-info-text b{color:var(--text);font-weight:600}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="content">
+
+<!-- HOME -->
+<div id="tab-home" class="tab active">
+<div class="page-title">Старший курьер</div>
+<div class="version-row"><span class="version-badge">v2.5</span><button class="changelog-btn" onclick="openModal('modal-changelog')">Что нового</button></div>
+<div id="urgent-banner"></div>
+
+<div class="card">
+  <div class="section-label">Смена</div>
+  <div class="form-row"><label class="form-label">Ваше имя</label><input id="shift-name" type="text" placeholder="Старший курьер"></div>
+  <div class="form-row"><label class="form-label">Зона / магазин</label><input id="shift-zone" type="text" placeholder="Название или номер зоны"></div>
+  <div class="shift-info-row">
+    <span class="shift-info-text">Начало: <b id="shift-start-display">—</b></span>
+    <button class="btn btn-primary btn-sm" onclick="saveShift()">Сохранить</button>
+  </div>
+</div>
+
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div class="section-label" style="margin:0">Команда на смене</div>
+    <span id="team-count" style="font-size:13px;font-weight:700;color:var(--accent)">0/0</span>
+  </div>
+  <div class="form-row" style="margin-bottom:8px"><input id="roster-name" type="text" placeholder="Имя курьера"></div>
+  <div class="input-row"><input id="roster-id" type="text" placeholder="ID (необязательно)"><button class="btn btn-primary btn-sm" onclick="addRosterMember()">Добавить</button></div>
+  <div id="roster-list" style="margin-top:12px"></div>
+</div>
+
+<div class="stat-grid">
+<div class="stat-card"><div class="stat-val" id="stat-tech">0</div><div class="stat-lbl">Техника</div></div>
+<div class="stat-card"><div class="stat-val" id="stat-bat">0/0</div><div class="stat-lbl">Батареи ✅/⚠️</div></div>
+<div class="stat-card"><div class="stat-val" id="stat-viol">0</div><div class="stat-lbl">Нарушения</div></div>
+<div class="stat-card"><div class="stat-val" id="stat-inst">0</div><div class="stat-lbl">Инструктажи</div></div>
+</div>
+<button class="btn btn-success" onclick="openReport()">📊 Сформировать отчёт</button>
+<button class="btn btn-outline" style="margin-top:10px" onclick="openAnalytics()">📋 Итоги смен</button>
+
+<div class="card" id="archive-card" style="display:none;margin-top:14px"></div>
+</div>
+
+<!-- ТЕХНИКА -->
+<div id="tab-tech" class="tab">
+<div class="page-title">Техника</div>
+<div class="card">
+<input type="hidden" id="tech-edit-id">
+<div class="form-row"><label class="form-label">QR / Пломба</label><input id="tech-qr" type="text" placeholder="Сканируй или введи"></div>
+<div class="form-row"><label class="form-label">Номер</label><input id="tech-num" type="text" placeholder="Бортовой номер"></div>
+<div class="form-2col">
+<div class="form-row"><label class="form-label">Тип</label><select id="tech-type"><option>Э-вел</option><option>Э-самокат</option><option>Велосипед</option><option>Другое</option></select></div>
+<div class="form-row"><label class="form-label">Статус</label><select id="tech-status" onchange="toggleTechPhoto()"><option value="ok">✅ Норма</option><option value="warn">⚠️ Замечание</option><option value="fix">🔧 В ремонт</option></select></div>
+</div>
+<div class="form-row"><label class="form-label">Комментарий</label><textarea id="tech-comment" placeholder="Описание проблемы"></textarea></div>
+<div class="urgent-toggle" id="tech-urgent" onclick="this.classList.toggle('on')"><span>🚨 Срочно — не ждёт конца смены</span><span class="ut-box"></span></div>
+<div class="photo-section" id="tech-photo-section" style="display:none">
+<span class="photo-label">📷 Фото поломки (до 2 шт.)</span>
+<div class="photo-row">
+<div class="photo-slot" id="tech-ph-0" onclick="triggerPhoto('tech',0)"><span class="add-icon">+</span></div>
+<div class="photo-slot" id="tech-ph-1" onclick="triggerPhoto('tech',1)"><span class="add-icon">+</span></div>
+</div>
+<input type="file" id="tech-file-0" accept="image/*" capture="environment" onchange="handlePhoto('tech',0,this)">
+<input type="file" id="tech-file-1" accept="image/*" capture="environment" onchange="handlePhoto('tech',1,this)">
+</div>
+<div style="display:flex;gap:8px;margin-top:14px">
+<button class="btn btn-primary" id="tech-save-btn" onclick="saveTech()">Сохранить</button>
+<button class="btn btn-outline btn-sm" id="tech-cancel-btn" style="display:none" onclick="cancelTechEdit()">Отмена</button>
+</div>
+</div>
+<div id="tech-list"></div>
+</div>
+
+<!-- БАТАРЕИ -->
+<div id="tab-bat" class="tab">
+<div class="page-title">Батареи</div>
+<div class="card"><div class="input-row"><input id="bat-input" type="text" placeholder="Номер батареи"><button class="btn btn-primary btn-sm" onclick="addBattery()">Добавить</button></div></div>
+<div id="bat-list"></div>
+</div>
+
+<!-- ЗОНА -->
+<div id="tab-zone" class="tab">
+<div class="page-title">Зона</div>
+<div class="card">
+<div class="section-label">Чек-лист</div>
+<div id="zone-checklist">
+<div class="check-item" data-idx="0" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Мусор убран</div></div>
+<div class="check-item" data-idx="1" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Продукты промаркированы</div></div>
+<div class="check-item" data-idx="2" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Сумки не на улице</div></div>
+<div class="check-item" data-idx="3" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Раздевалка в порядке</div></div>
+<div class="check-item" data-idx="4" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Зона готова к работе</div></div>
+</div>
+</div>
+<div class="card">
+<div class="section-label">Сумки</div>
+<div class="form-2col">
+<div class="form-row"><label class="form-label">Всего</label><input id="bags-total" type="number" placeholder="0"></div>
+<div class="form-row"><label class="form-label">Выдано</label><input id="bags-issued" type="number" placeholder="0"></div>
+</div>
+<div class="form-row"><label class="form-label">Повреждено</label><input id="bags-damaged" type="number" placeholder="0"></div>
+<div class="form-row"><label class="form-label">Комментарий</label><textarea id="zone-comment" placeholder="Заметки по зоне"></textarea></div>
+<div class="photo-section">
+<span class="photo-label">📷 Фото зоны (до 2 шт.)</span>
+<div class="photo-row">
+<div class="photo-slot" id="zone-ph-0" onclick="triggerPhoto('zone',0)"><span class="add-icon">+</span></div>
+<div class="photo-slot" id="zone-ph-1" onclick="triggerPhoto('zone',1)"><span class="add-icon">+</span></div>
+</div>
+<input type="file" id="zone-file-0" accept="image/*" capture="environment" onchange="handlePhoto('zone',0,this)">
+<input type="file" id="zone-file-1" accept="image/*" capture="environment" onchange="handlePhoto('zone',1,this)">
+</div>
+<button class="btn btn-primary" style="margin-top:14px" onclick="saveZone()">Сохранить</button>
+</div>
+</div>
+
+<!-- НАРУШЕНИЯ -->
+<div id="tab-viol" class="tab">
+<div class="page-title">Нарушения</div>
+<div class="card">
+<input type="hidden" id="viol-edit-id">
+<div id="viol-roster-chips" style="display:none;margin-bottom:12px"></div>
+<div class="form-row"><label class="form-label">ID курьера</label><input id="viol-id" type="text" placeholder="Табельный номер или ID"></div>
+<div class="form-row"><label class="form-label">Имя (необязательно)</label><input id="viol-name" type="text" placeholder="Имя курьера"></div>
+<div class="form-row"><label class="form-label">Тип нарушения</label><select id="viol-type"><option>ПДД</option><option>Внешний вид</option><option>Опоздание</option><option>Поведение</option><option>Оборудование</option><option>Другое</option></select></div>
+<div class="form-row"><label class="form-label">Описание</label><textarea id="viol-desc" placeholder="Подробности нарушения"></textarea></div>
+<div class="urgent-toggle" id="viol-urgent" onclick="this.classList.toggle('on')"><span>🚨 Срочно — не ждёт конца смены</span><span class="ut-box"></span></div>
+<div class="photo-section">
+<span class="photo-label">📷 Фото нарушения (до 2 шт.)</span>
+<div class="photo-row">
+<div class="photo-slot" id="viol-ph-0" onclick="triggerPhoto('viol',0)"><span class="add-icon">+</span></div>
+<div class="photo-slot" id="viol-ph-1" onclick="triggerPhoto('viol',1)"><span class="add-icon">+</span></div>
+</div>
+<input type="file" id="viol-file-0" accept="image/*" capture="environment" onchange="handlePhoto('viol',0,this)">
+<input type="file" id="viol-file-1" accept="image/*" capture="environment" onchange="handlePhoto('viol',1,this)">
+</div>
+<div style="display:flex;gap:8px;margin-top:14px">
+<button class="btn btn-danger" id="viol-save-btn" onclick="saveViolation()">Сохранить</button>
+<button class="btn btn-outline btn-sm" id="viol-cancel-btn" style="display:none" onclick="cancelViolEdit()">Отмена</button>
+</div>
+</div>
+<div id="viol-list"></div>
+</div>
+
+<!-- ИНСТРУКТАЖ -->
+<div id="tab-inst" class="tab">
+<div class="page-title">Инструктаж</div>
+<div class="card">
+<input type="hidden" id="inst-edit-id">
+<div id="inst-roster-chips" style="display:none;margin-bottom:12px"></div>
+<div class="form-row"><label class="form-label">ID / Имя курьера</label><input id="inst-name" type="text" placeholder="Кого инструктировали"></div>
+<div class="section-label" style="margin-top:8px">Темы</div>
+<div class="check-item" data-topic="ПДД" onclick="toggleTopic(this)"><div class="check-box"></div><div class="check-text">ПДД</div></div>
+<div class="check-item" data-topic="Безопасность" onclick="toggleTopic(this)"><div class="check-box"></div><div class="check-text">Безопасность</div></div>
+<div class="check-item" data-topic="Оборудование" onclick="toggleTopic(this)"><div class="check-box"></div><div class="check-text">Оборудование</div></div>
+<div class="check-item" data-topic="Внешний вид" onclick="toggleTopic(this)"><div class="check-box"></div><div class="check-text">Внешний вид</div></div>
+<div class="check-item" data-topic="Регламент" onclick="toggleTopic(this)"><div class="check-box"></div><div class="check-text">Регламент</div></div>
+<div class="divider"></div>
+<div class="form-row"><label class="form-label">Заметка</label><textarea id="inst-note" placeholder="Дополнительно"></textarea></div>
+<div style="display:flex;gap:8px">
+<button class="btn btn-primary" id="inst-save-btn" onclick="saveInst()">Сохранить</button>
+<button class="btn btn-outline btn-sm" id="inst-cancel-btn" style="display:none" onclick="cancelInstEdit()">Отмена</button>
+</div>
+</div>
+<div id="inst-list"></div>
+</div>
+
+</div><!-- /content -->
+
+<nav class="nav">
+<button class="nav-btn active" onclick="switchTab(0,this)">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Главная
+</button>
+<button class="nav-btn" onclick="switchTab(1,this)">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>Техника
+</button>
+<button class="nav-btn" onclick="switchTab(2,this)">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="16" height="10" rx="2"/><path d="M22 11v2"/><line x1="6" y1="12" x2="12" y2="12"/></svg>Батареи
+</button>
+<button class="nav-btn" onclick="switchTab(3,this)">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Зона
+</button>
+<button class="nav-btn" onclick="switchTab(4,this)">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Нарушения
+</button>
+<button class="nav-btn" onclick="switchTab(5,this)">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Инструктаж
+</button>
+</nav>
+</div><!-- /app -->
+
+<!-- MODAL REPORT -->
+<div class="modal" id="modal-report">
+<div class="modal-box">
+<div class="modal-title">📊 Отчёт за смену</div>
+<div class="report-body" id="report-html"></div>
+<div class="modal-btns">
+<button class="btn btn-primary" onclick="shareReport()">📤 Поделиться / Telegram</button>
+<button class="btn btn-success" onclick="archiveShift()">✅ Закрыть смену → в архив</button>
+<button class="btn btn-outline" onclick="downloadReport()">💾 Скачать HTML</button>
+<button class="btn btn-outline" onclick="exportCurrentCSV()">📄 Экспорт CSV</button>
+<button class="btn btn-outline" onclick="clearShift()">🗑 Очистить без сохранения</button>
+<button class="btn btn-outline" onclick="closeModal('modal-report')">Закрыть</button>
+</div>
+</div>
+</div>
+
+<!-- MODAL ANALYTICS -->
+<div class="modal" id="modal-analytics">
+<div class="modal-box">
+<div class="modal-title">📋 Итоги смен</div>
+<div class="report-body" style="background:transparent;padding:0" id="analytics-body"></div>
+<div class="modal-btns">
+<button class="btn btn-outline" onclick="closeModal('modal-analytics')">Закрыть</button>
+</div>
+</div>
+</div>
+
+<!-- MODAL ARCHIVE LIST -->
+<div class="modal" id="modal-archive">
+<div class="modal-box">
+<div class="modal-title">📚 Архив смен</div>
+<div class="report-body" style="background:transparent;padding:0" id="archive-list"></div>
+<div class="modal-btns">
+<button class="btn btn-outline" onclick="exportArchiveCSV()">📄 Экспорт всего архива (CSV)</button>
+<button class="btn btn-outline" onclick="closeModal('modal-archive')">Закрыть</button>
+</div>
+</div>
+</div>
+
+<!-- MODAL ARCHIVE VIEW -->
+<div class="modal" id="modal-archive-view">
+<div class="modal-box">
+<div class="modal-title">📋 Смена из архива</div>
+<div class="report-body" id="archive-view-html"></div>
+<div class="modal-btns">
+<button class="btn btn-primary" onclick="shareArchived()">📤 Поделиться</button>
+<button class="btn btn-outline" onclick="downloadArchived()">💾 Скачать HTML</button>
+<button class="btn btn-outline" onclick="deleteViewedArchive()">🗑 Удалить из архива</button>
+<button class="btn btn-outline" onclick="closeModal('modal-archive-view')">Закрыть</button>
+</div>
+</div>
+</div>
+
+<!-- MODAL BAT PHOTO -->
+<div class="modal" id="modal-bat-photo">
+<div class="modal-box">
+<div class="modal-title" id="bat-photo-title">Фото батареи</div>
+<div class="report-body" style="background:transparent;padding:0">
+<div class="photo-row" style="margin-bottom:16px">
+<div class="photo-slot" id="bat-ph-0" onclick="triggerPhoto('bat',0)"><span class="add-icon">+</span></div>
+<div class="photo-slot" id="bat-ph-1" onclick="triggerPhoto('bat',1)"><span class="add-icon">+</span></div>
+</div>
+<input type="file" id="bat-file-0" accept="image/*" capture="environment" onchange="handlePhoto('bat',0,this)">
+<input type="file" id="bat-file-1" accept="image/*" capture="environment" onchange="handlePhoto('bat',1,this)">
+</div>
+<div class="modal-btns">
+<button class="btn btn-primary" onclick="saveBatPhotos()">Сохранить фото</button>
+<button class="btn btn-outline" onclick="closeModal('modal-bat-photo')">Закрыть</button>
+</div>
+</div>
+</div>
+
+<!-- MODAL CHANGELOG -->
+<div class="modal" id="modal-changelog">
+<div class="modal-box">
+<div class="modal-title">📋 История версий</div>
+<div class="report-body">
+<div class="cl-version">v2.5 — текущая</div><div class="cl-date">17 июня 2025</div>
+<div class="cl-item">Срочные инциденты: флаг «🚨 Срочно» у техники и нарушений, баннер на главной, кнопка «Эскалировать»</div>
+<div class="cl-item">Экспорт CSV: смена и весь архив выгружаются таблицей для бэк-офиса</div>
+<div class="cl-version">v2.4</div><div class="cl-date">17 июня 2025</div>
+<div class="cl-item">Команда на смене: список курьеров, отметка явки, переход на следующую смену</div>
+<div class="cl-item">Выбор курьера тапом в нарушениях и инструктажах — без ручного ввода ID</div>
+<div class="cl-item">Команда в отчёте смены</div>
+<div class="cl-version">v2.3</div><div class="cl-date">17 июня 2025</div>
+<div class="cl-item">Офлайн-режим: приложение работает без сети (важно в дарксторах с плохим сигналом)</div>
+<div class="cl-item">Установка на главный экран как обычное приложение (PWA)</div>
+<div class="cl-version">v2.2</div><div class="cl-date">17 июня 2025</div>
+<div class="cl-item">Итоги смен: простые выводы на главном экране + детали (повторные нарушители, проблемная техника, брак батарей, готовность зоны)</div>
+<div class="cl-version">v2.1</div><div class="cl-date">17 июня 2025</div>
+<div class="cl-item">Архив смен: каждая закрытая смена сохраняется, прошлые можно открыть</div>
+<div class="cl-item">История смен на главной + просмотр и экспорт прошлых отчётов</div>
+<div class="cl-item">Дизайн приведён к реальному стилю Яндекс Про</div>
+<div class="cl-version">v2.0</div><div class="cl-date">17 июня 2025</div>
+<div class="cl-item">Карточка смены: имя СК, зона, время начала — теперь в отчёте</div>
+<div class="cl-item">Инструктаж вынесен в главную навигацию</div>
+<div class="cl-item">Фотофиксация нарушений (до 2 фото)</div>
+<div class="cl-item">Кнопка «Поделиться» — отправка отчёта в Telegram или копирование текста</div>
+<div class="cl-version">v1.5</div><div class="cl-date">20 мая 2025</div>
+<div class="cl-item">Фикс модалки: кнопки всегда видны, отчёт скроллится отдельно</div>
+<div class="cl-version">v1.4</div><div class="cl-date">20 мая 2025</div>
+<div class="cl-item">Кнопка «Скачать отчёт» — сохраняет HTML-файл на устройство</div>
+<div class="cl-version">v1.3</div><div class="cl-date">19 мая 2025</div>
+<div class="cl-item">Инструктаж в меню «Ещё», фикс навигации, версия на главной</div>
+<div class="cl-version">v1.2</div><div class="cl-date">19 мая 2025</div>
+<div class="cl-item">Фотофиксация техники, батарей, зоны</div>
+<div class="cl-version">v1.0 – v1.1</div><div class="cl-date">18–19 мая 2025</div>
+<div class="cl-item">Первый запуск, дизайн в стиле Яндекс Про</div>
+</div>
+<div class="modal-btns">
+<button class="btn btn-outline" onclick="closeModal('modal-changelog')">Закрыть</button>
+</div>
+</div>
+</div>
+
+<script>
+try{if(window.Telegram&&window.Telegram.WebApp){Telegram.WebApp.ready();Telegram.WebApp.expand();if(Telegram.WebApp.setHeaderColor)Telegram.WebApp.setHeaderColor('#FFFFFF')}}catch(e){}
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
+
+function todayKey(){return'sc_'+new Date().toISOString().slice(0,10)}
+function loadData(){try{return JSON.parse(localStorage.getItem(todayKey()))||defaultData()}catch(e){return defaultData()}}
+function saveData(d){try{localStorage.setItem(todayKey(),JSON.stringify(d))}catch(e){showToast('⚠️ Мало памяти')}}
+function defaultData(){return{shift:{name:'',zone:'',startTime:now()},roster:[],tech:[],batteries:[],zone:{checks:[false,false,false,false,false],bags:{total:'',issued:'',damaged:''},comment:'',photos:[null,null]},violations:[],instructions:[]}}
+function now(){return new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}
+
+let data=loadData(),tempPhotos={tech:[null,null],bat:[null,null],zone:[null,null],viol:[null,null]},currentBatNum=null;
+if(!Array.isArray(data.roster))data.roster=[];
+let _uid=Date.now();function uid(){return ++_uid}
+const tabs=['tab-home','tab-tech','tab-bat','tab-zone','tab-viol','tab-inst'];
+const tabRenderers=[renderHome,renderTechList,renderBatteries,renderZone,renderViolations,renderInstructions];
+
+function switchTab(i,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(tabs[i]).classList.add('active');
+  if(btn)btn.classList.add('active');
+  document.getElementById('content').scrollTop=0;
+  tabRenderers[i]&&tabRenderers[i]();
+}
+
+function renderHome(){updateStats();renderShiftCard();renderRoster();renderUrgentBanner();renderArchiveCard()}
+
+/* ── РОСТЕР КОМАНДЫ ── */
+function addRosterMember(){
+  const name=document.getElementById('roster-name').value.trim(),cid=document.getElementById('roster-id').value.trim();
+  if(!name&&!cid){showToast('Введите имя или ID');return}
+  data.roster.push({id:uid(),name:name||cid,courierId:cid,present:true});
+  saveData(data);
+  document.getElementById('roster-name').value='';document.getElementById('roster-id').value='';
+  renderRoster();showToast('👤 Добавлен');
+}
+function togglePresent(id){const m=data.roster.find(r=>r.id==id);if(m){m.present=!m.present;saveData(data);renderRoster()}}
+function removeRosterMember(id){data.roster=data.roster.filter(r=>r.id!=id);saveData(data);renderRoster()}
+function renderRoster(){
+  const list=document.getElementById('roster-list');if(!list)return;
+  const present=data.roster.filter(r=>r.present).length;
+  document.getElementById('team-count').textContent=present+'/'+data.roster.length;
+  if(!data.roster.length){list.innerHTML='<div style="font-size:13px;color:var(--text-sec);padding:2px 0">Никого нет. Добавь курьеров смены.</div>';return}
+  list.innerHTML=data.roster.map(m=>'<div class="roster-item"><div class="roster-info" onclick="togglePresent('+m.id+')"><span class="present-dot'+(m.present?'':' absent')+'"></span><div style="min-width:0"><div class="roster-name">'+m.name+'</div>'+(m.courierId&&m.courierId!==m.name?'<div class="roster-id">ID '+m.courierId+'</div>':'')+'</div></div><span class="roster-status" style="color:'+(m.present?'var(--accent2)':'var(--text-ter)')+'">'+(m.present?'на смене':'нет')+'</span><button class="roster-x" onclick="removeRosterMember('+m.id+')">×</button></div>').join('');
+}
+function renderRosterChips(ctx){
+  const el=document.getElementById(ctx+'-roster-chips');if(!el)return;
+  if(!data.roster.length){el.style.display='none';el.innerHTML='';return}
+  el.style.display='block';
+  el.innerHTML='<div style="font-size:12px;color:var(--text-sec);margin-bottom:7px;font-weight:600">Выбрать из команды:</div>'+data.roster.map(m=>'<span class="rchip" onclick="pickRoster(\''+ctx+'\','+m.id+')">'+m.name+'</span>').join('');
+}
+function pickRoster(ctx,id){
+  const m=data.roster.find(r=>r.id==id);if(!m)return;
+  if(ctx==='viol'){document.getElementById('viol-id').value=m.courierId||m.name;document.getElementById('viol-name').value=m.name}
+  else if(ctx==='inst'){document.getElementById('inst-name').value=m.name+(m.courierId&&m.courierId!==m.name?' ('+m.courierId+')':'')}
+}
+
+/* ── СРОЧНЫЕ ИНЦИДЕНТЫ ── */
+function urgentItems(){
+  const out=[];
+  data.tech.filter(t=>t.urgent).forEach(t=>out.push('🚲 '+([t.type,t.qr,t.num].filter(Boolean).join(' ')||'техника')+(t.comment?' — '+t.comment:'')));
+  data.violations.filter(v=>v.urgent).forEach(v=>out.push('⚠️ '+v.courierId+(v.name?' ('+v.name+')':'')+' — '+v.type+(v.desc?': '+v.desc:'')));
+  return out;
+}
+function renderUrgentBanner(){
+  const el=document.getElementById('urgent-banner');if(!el)return;
+  const items=urgentItems();
+  if(!items.length){el.innerHTML='';el.style.display='none';return}
+  el.style.display='block';
+  el.innerHTML='<div class="urgent-banner"><div class="urgent-banner-title">🚨 Срочное · '+items.length+'</div>'+items.map(i=>'<div class="urgent-banner-item">• '+i+'</div>').join('')+'<button class="btn btn-danger" style="margin-top:12px" onclick="escalate()">📤 Эскалировать сейчас</button></div>';
+}
+function escalate(){
+  const items=urgentItems();if(!items.length){showToast('Нет срочного');return}
+  const sk=data.shift.name||'',zone=data.shift.zone||'';
+  const text='🚨 СРОЧНО — требует внимания\n'+(zone?'📍 '+zone+'\n':'')+(sk?'👤 '+sk+'\n':'')+'⏱ '+now()+'\n\n'+items.map(i=>'• '+i).join('\n');
+  if(navigator.share){navigator.share({title:'Срочно',text}).catch(()=>copyTextFallback(text))}else copyTextFallback(text);
+}
+
+/* ── ЭКСПОРТ CSV ── */
+function csvEscape(v){v=(v==null?'':String(v));if(/[";\n]/.test(v))v='"'+v.replace(/"/g,'""')+'"';return v}
+function buildCSV(shifts){
+  const rows=[['Дата','Зона','Старший курьер','Раздел','Объект','Статус','Комментарий','Время']];
+  shifts.forEach(s=>{
+    const date=s.shift.reportDate||new Date().toLocaleDateString('ru-RU'),zone=s.shift.zone||'',sk=s.shift.name||'';
+    const push=(razdel,obj,status,comment,time)=>rows.push([date,zone,sk,razdel,obj,status,comment,time||'']);
+    (s.roster||[]).forEach(m=>push('Команда',m.name+(m.courierId&&m.courierId!==m.name?' ('+m.courierId+')':''),m.present?'на смене':'отсутствует','',''));
+    (s.tech||[]).forEach(t=>{const st={ok:'Норма',warn:'Замечание',fix:'Ремонт'}[t.status]||t.status;push('Техника',[t.type,t.qr,t.num].filter(Boolean).join(' '),(t.urgent?'СРОЧНО · ':'')+st,t.comment||'',t.time)});
+    (s.batteries||[]).forEach(b=>{const st={ok:'Норма',weak:'Слабая',broken:'Сломана'}[b.status]||b.status;push('Батарея',b.num,st,'','')});
+    if(s.zone){const done=s.zone.checks.filter(Boolean).length;push('Зона','Готовность',done+'/5','Сумки '+(s.zone.bags.total||0)+'/'+(s.zone.bags.issued||0)+'/'+(s.zone.bags.damaged||0)+(s.zone.comment?' · '+s.zone.comment:''),'')}
+    (s.violations||[]).forEach(v=>push('Нарушение',v.courierId+(v.name?' ('+v.name+')':''),(v.urgent?'СРОЧНО · ':'')+v.type,v.desc||'',v.time));
+    (s.instructions||[]).forEach(i=>push('Инструктаж',i.name,(i.topics||[]).join(', '),i.note||'',i.time));
+  });
+  return rows.map(r=>r.map(csvEscape).join(';')).join('\r\n');
+}
+function downloadCSV(shifts,fname){
+  const csv='﻿'+buildCSV(shifts);
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=fname;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a)},1000);showToast('📄 CSV сохранён');
+}
+function exportCurrentCSV(){downloadCSV([data],'smena-'+(data.shift.reportDate||new Date().toLocaleDateString('ru-RU')).replace(/\./g,'-')+'.csv')}
+function exportArchiveCSV(){const arch=loadArchive();if(!arch.length){showToast('Архив пуст');return}downloadCSV(arch.map(a=>a.data),'arhiv-smen.csv')}
+function renderShiftCard(){
+  document.getElementById('shift-name').value=data.shift.name||'';
+  document.getElementById('shift-zone').value=data.shift.zone||'';
+  document.getElementById('shift-start-display').textContent=data.shift.startTime||'—';
+}
+function saveShift(){
+  data.shift.name=document.getElementById('shift-name').value.trim();
+  data.shift.zone=document.getElementById('shift-zone').value.trim();
+  if(!data.shift.startTime)data.shift.startTime=now();
+  saveData(data);
+  renderShiftCard();
+  showToast('✅ Смена сохранена');
+}
+
+function updateStats(){
+  document.getElementById('stat-tech').textContent=data.tech.length;
+  document.getElementById('stat-bat').textContent=data.batteries.filter(b=>b.status==='ok').length+'/'+data.batteries.filter(b=>b.status!=='ok').length;
+  document.getElementById('stat-viol').textContent=data.violations.length;
+  document.getElementById('stat-inst').textContent=data.instructions.length;
+}
+function showToast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2200)}
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+
+function compressImage(file,cb){const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{const MAX=800;let w=img.width,h=img.height;if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX}else{w=Math.round(w*MAX/h);h=MAX}}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.72))};img.src=e.target.result};r.readAsDataURL(file)}
+function triggerPhoto(ctx,idx){document.getElementById(ctx+'-file-'+idx).click()}
+function handlePhoto(ctx,idx,input){if(!input.files||!input.files[0])return;compressImage(input.files[0],b64=>{tempPhotos[ctx][idx]=b64;const s=document.getElementById(ctx+'-ph-'+idx);s.innerHTML='<img src="'+b64+'"><button class="del-photo" onclick="delPhoto(event,\''+ctx+'\','+idx+')">×</button>'})}
+function delPhoto(e,ctx,idx){e.stopPropagation();tempPhotos[ctx][idx]=null;document.getElementById(ctx+'-ph-'+idx).innerHTML='<span class="add-icon">+</span>'}
+
+function toggleTechPhoto(){const s=document.getElementById('tech-status').value;document.getElementById('tech-photo-section').style.display=(s==='warn'||s==='fix')?'block':'none';if(s==='ok'){tempPhotos.tech=[null,null];[0,1].forEach(i=>{const sl=document.getElementById('tech-ph-'+i);if(sl)sl.innerHTML='<span class="add-icon">+</span>'})}}
+function saveTech(){const editId=document.getElementById('tech-edit-id').value,qr=document.getElementById('tech-qr').value.trim(),num=document.getElementById('tech-num').value.trim(),type=document.getElementById('tech-type').value,status=document.getElementById('tech-status').value,comment=document.getElementById('tech-comment').value.trim();if(!qr&&!num){showToast('Введите QR или номер');return}const urgent=document.getElementById('tech-urgent').classList.contains('on');const photos=status!=='ok'?[...tempPhotos.tech]:[null,null];if(editId){const idx=data.tech.findIndex(t=>t.id==editId);if(idx!==-1)data.tech[idx]={...data.tech[idx],qr,num,type,status,comment,photos,urgent};cancelTechEdit();showToast('✅ Обновлено')}else{data.tech.push({id:uid(),qr,num,type,status,comment,photos,urgent,time:now()});showToast('✅ Сохранено')}saveData(data);document.getElementById('tech-qr').value='';document.getElementById('tech-num').value='';document.getElementById('tech-comment').value='';document.getElementById('tech-status').value='ok';document.getElementById('tech-type').value='Э-вел';document.getElementById('tech-urgent').classList.remove('on');tempPhotos.tech=[null,null];toggleTechPhoto();renderTechList();renderUrgentBanner()}
+function cancelTechEdit(){document.getElementById('tech-edit-id').value='';document.getElementById('tech-save-btn').textContent='Сохранить';document.getElementById('tech-cancel-btn').style.display='none';document.getElementById('tech-qr').value='';document.getElementById('tech-num').value='';document.getElementById('tech-comment').value='';document.getElementById('tech-status').value='ok';document.getElementById('tech-type').value='Э-вел';document.getElementById('tech-urgent').classList.remove('on');tempPhotos.tech=[null,null];toggleTechPhoto()}
+function editTech(id){const r=data.tech.find(t=>t.id==id);if(!r)return;document.getElementById('tech-edit-id').value=r.id;document.getElementById('tech-qr').value=r.qr||'';document.getElementById('tech-num').value=r.num||'';document.getElementById('tech-type').value=r.type||'Э-вел';document.getElementById('tech-status').value=r.status;document.getElementById('tech-comment').value=r.comment||'';document.getElementById('tech-urgent').classList.toggle('on',!!r.urgent);document.getElementById('tech-save-btn').textContent='Обновить';document.getElementById('tech-cancel-btn').style.display='block';tempPhotos.tech=r.photos?[...r.photos]:[null,null];toggleTechPhoto();[0,1].forEach(i=>{const sl=document.getElementById('tech-ph-'+i);if(sl&&tempPhotos.tech[i])sl.innerHTML='<img src="'+tempPhotos.tech[i]+'"><button class="del-photo" onclick="delPhoto(event,\'tech\','+i+')">×</button>';else if(sl)sl.innerHTML='<span class="add-icon">+</span>'});document.getElementById('content').scrollTop=0}
+function deleteTech(id){if(!confirm('Удалить?'))return;data.tech=data.tech.filter(t=>t.id!=id);saveData(data);renderTechList();showToast('🗑 Удалено')}
+function renderTechList(){const list=document.getElementById('tech-list');if(!data.tech.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">🚲</div><p>Записей пока нет</p></div>';return}const B={ok:['badge-ok','✅ Норма'],warn:['badge-warn','⚠️ Замечание'],fix:['badge-fix','🔧 Ремонт']};list.innerHTML=[...data.tech].reverse().map(r=>{const[cls,lbl]=B[r.status]||B.ok;const title=[r.type,r.qr,r.num].filter(Boolean).join(' · ')||'—';const ph=(r.photos||[]).filter(Boolean);return'<div class="record-item">'+(r.urgent?'<div><span class="urgent-badge">🚨 СРОЧНО</span></div>':'')+'<div class="record-header"><div class="record-id">'+title+'</div><div class="record-time">'+r.time+'</div></div><span class="status-badge '+cls+'">'+lbl+'</span>'+(r.comment?'<div class="record-comment">'+r.comment+'</div>':'')+(ph.length?'<div style="display:flex;gap:6px;margin-top:8px">'+ph.map(p=>'<img src="'+p+'" style="width:72px;height:54px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">').join('')+'</div>':'')+'<div class="record-actions"><button class="action-btn action-edit" onclick="editTech('+r.id+')">✏️ Изменить</button><button class="action-btn action-del" onclick="deleteTech('+r.id+')">🗑 Удалить</button></div></div>'}).join('')}
+
+function addBattery(){const num=document.getElementById('bat-input').value.trim();if(!num){showToast('Введите номер');return}if(data.batteries.find(b=>b.num===num)){showToast('Уже добавлена');return}data.batteries.push({num,status:'ok',photos:[null,null]});saveData(data);document.getElementById('bat-input').value='';renderBatteries();showToast('🔋 Добавлена')}
+function setBatStatus(num,status){const b=data.batteries.find(b=>b.num===num);if(b){b.status=status;saveData(data);renderBatteries()}}
+function openBatPhoto(num){currentBatNum=num;const b=data.batteries.find(b=>b.num===num);tempPhotos.bat=b&&b.photos?[...b.photos]:[null,null];document.getElementById('bat-photo-title').textContent='📷 Фото батареи '+num;[0,1].forEach(i=>{const sl=document.getElementById('bat-ph-'+i);if(tempPhotos.bat[i])sl.innerHTML='<img src="'+tempPhotos.bat[i]+'"><button class="del-photo" onclick="delPhoto(event,\'bat\','+i+')">×</button>';else sl.innerHTML='<span class="add-icon">+</span>'});openModal('modal-bat-photo')}
+function saveBatPhotos(){const b=data.batteries.find(b=>b.num===currentBatNum);if(b){b.photos=[...tempPhotos.bat];saveData(data)}closeModal('modal-bat-photo');renderBatteries();showToast('📷 Сохранено')}
+function removeBattery(num){data.batteries=data.batteries.filter(b=>b.num!==num);saveData(data);renderBatteries()}
+function renderBatteries(){const list=document.getElementById('bat-list');if(!data.batteries.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">🔋</div><p>Батарей пока нет</p></div>';return}list.innerHTML=data.batteries.map(b=>{const ph=(b.photos||[]).filter(Boolean);const sp=b.status!=='ok';return'<div class="battery-card"><div class="battery-top"><div class="battery-num">🔋 '+b.num+'</div><button onclick="removeBattery(\''+b.num+'\')" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-sec)">×</button></div><div class="status-pills"><div class="pill '+(b.status==='ok'?'active-ok':'')+'" onclick="setBatStatus(\''+b.num+'\',\'ok\')">✅ Норма</div><div class="pill '+(b.status==='weak'?'active-warn':'')+'" onclick="setBatStatus(\''+b.num+'\',\'weak\')">⚠️ Слабая</div><div class="pill '+(b.status==='broken'?'active-broken':'')+'" onclick="setBatStatus(\''+b.num+'\',\'broken\')">❌ Сломана</div></div>'+(sp?'<button class="action-btn action-edit" style="margin-top:10px" onclick="openBatPhoto(\''+b.num+'\')">📷 Фото</button>':'')+(ph.length?'<div style="display:flex;gap:6px;margin-top:8px">'+ph.map(p=>'<img src="'+p+'" style="width:72px;height:54px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">').join('')+'</div>':'')+'</div>'}).join('')}
+
+function toggleCheck(el){const i=parseInt(el.dataset.idx);data.zone.checks[i]=!data.zone.checks[i];el.classList.toggle('checked',data.zone.checks[i]);saveData(data)}
+function saveZone(){data.zone.bags.total=document.getElementById('bags-total').value;data.zone.bags.issued=document.getElementById('bags-issued').value;data.zone.bags.damaged=document.getElementById('bags-damaged').value;data.zone.comment=document.getElementById('zone-comment').value.trim();data.zone.photos=[...tempPhotos.zone];saveData(data);showToast('✅ Зона сохранена')}
+function renderZone(){document.querySelectorAll('#zone-checklist .check-item').forEach((el,i)=>el.classList.toggle('checked',!!data.zone.checks[i]));document.getElementById('bags-total').value=data.zone.bags.total||'';document.getElementById('bags-issued').value=data.zone.bags.issued||'';document.getElementById('bags-damaged').value=data.zone.bags.damaged||'';document.getElementById('zone-comment').value=data.zone.comment||'';tempPhotos.zone=data.zone.photos?[...data.zone.photos]:[null,null];[0,1].forEach(i=>{const sl=document.getElementById('zone-ph-'+i);if(sl&&tempPhotos.zone[i])sl.innerHTML='<img src="'+tempPhotos.zone[i]+'"><button class="del-photo" onclick="delPhoto(event,\'zone\','+i+')">×</button>';else if(sl)sl.innerHTML='<span class="add-icon">+</span>'})}
+
+function saveViolation(){
+  const editId=document.getElementById('viol-edit-id').value,courierId=document.getElementById('viol-id').value.trim();
+  if(!courierId){showToast('Введите ID');return}
+  const name=document.getElementById('viol-name').value.trim(),type=document.getElementById('viol-type').value,desc=document.getElementById('viol-desc').value.trim(),photos=[...tempPhotos.viol],urgent=document.getElementById('viol-urgent').classList.contains('on');
+  if(editId){const idx=data.violations.findIndex(v=>v.id==editId);if(idx!==-1)data.violations[idx]={...data.violations[idx],courierId,name,type,desc,photos,urgent};cancelViolEdit();showToast('✅ Обновлено')}
+  else{data.violations.push({id:uid(),courierId,name,type,desc,photos,urgent,time:now()});showToast('✅ Сохранено')}
+  saveData(data);document.getElementById('viol-id').value='';document.getElementById('viol-name').value='';document.getElementById('viol-desc').value='';document.getElementById('viol-type').value='ПДД';document.getElementById('viol-urgent').classList.remove('on');tempPhotos.viol=[null,null];[0,1].forEach(i=>{const sl=document.getElementById('viol-ph-'+i);if(sl)sl.innerHTML='<span class="add-icon">+</span>'});renderViolations();renderUrgentBanner();
+}
+function cancelViolEdit(){document.getElementById('viol-edit-id').value='';document.getElementById('viol-save-btn').textContent='Сохранить';document.getElementById('viol-cancel-btn').style.display='none';document.getElementById('viol-id').value='';document.getElementById('viol-name').value='';document.getElementById('viol-desc').value='';document.getElementById('viol-type').value='ПДД';document.getElementById('viol-urgent').classList.remove('on');tempPhotos.viol=[null,null];[0,1].forEach(i=>{const sl=document.getElementById('viol-ph-'+i);if(sl)sl.innerHTML='<span class="add-icon">+</span>'})}
+function editViolation(id){const r=data.violations.find(v=>v.id==id);if(!r)return;document.getElementById('viol-edit-id').value=r.id;document.getElementById('viol-id').value=r.courierId;document.getElementById('viol-name').value=r.name||'';document.getElementById('viol-type').value=r.type;document.getElementById('viol-desc').value=r.desc||'';document.getElementById('viol-urgent').classList.toggle('on',!!r.urgent);document.getElementById('viol-save-btn').textContent='Обновить';document.getElementById('viol-cancel-btn').style.display='block';tempPhotos.viol=r.photos?[...r.photos]:[null,null];[0,1].forEach(i=>{const sl=document.getElementById('viol-ph-'+i);if(sl&&tempPhotos.viol[i])sl.innerHTML='<img src="'+tempPhotos.viol[i]+'"><button class="del-photo" onclick="delPhoto(event,\'viol\','+i+')">×</button>';else if(sl)sl.innerHTML='<span class="add-icon">+</span>'});document.getElementById('content').scrollTop=0}
+function deleteViolation(id){if(!confirm('Удалить?'))return;data.violations=data.violations.filter(v=>v.id!=id);saveData(data);renderViolations();showToast('🗑 Удалено')}
+function copyComplaint(id){const r=data.violations.find(v=>v.id==id);if(!r)return;const date=new Date().toLocaleDateString('ru-RU');const text='Нарушение: '+r.type+'\nКурьер: '+r.courierId+(r.name?' | '+r.name:'')+'\nВремя: '+r.time+'\nДата: '+date+(r.desc?'\nОписание: '+r.desc:'')+'\n\nЗафиксировано старшим курьером'+(data.shift.name?' '+data.shift.name:'')+(data.shift.zone?', зона '+data.shift.zone:'')+'.';try{if(navigator.clipboard)navigator.clipboard.writeText(text);else{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta)}}catch(e){}showToast('📋 Скопировано')}
+function renderViolations(){renderRosterChips('viol');const list=document.getElementById('viol-list');if(!data.violations.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div><p>Нарушений нет</p></div>';return}list.innerHTML=[...data.violations].reverse().map(r=>{const ph=(r.photos||[]).filter(Boolean);return'<div class="record-item">'+(r.urgent?'<div><span class="urgent-badge">🚨 СРОЧНО</span></div>':'')+'<div class="record-header"><div class="record-id">'+r.courierId+(r.name?' · '+r.name:'')+'</div><div class="record-time">'+r.time+'</div></div><span class="status-badge badge-fix">'+r.type+'</span>'+(r.desc?'<div class="record-comment">'+r.desc+'</div>':'')+(ph.length?'<div style="display:flex;gap:6px;margin-top:8px">'+ph.map(p=>'<img src="'+p+'" style="width:72px;height:54px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">').join('')+'</div>':'')+'<div class="record-actions"><button class="action-btn action-edit" onclick="editViolation('+r.id+')">✏️ Изменить</button><button class="action-btn action-copy" onclick="copyComplaint('+r.id+')">📋 Жалоба</button><button class="action-btn action-del" onclick="deleteViolation('+r.id+')">🗑 Удалить</button></div></div>'}).join('')}
+
+function toggleTopic(el){el.classList.toggle('checked')}
+function saveInst(){const editId=document.getElementById('inst-edit-id').value,name=document.getElementById('inst-name').value.trim();if(!name){showToast('Введите имя');return}const topics=[];document.querySelectorAll('#tab-inst .check-item[data-topic]').forEach(el=>{if(el.classList.contains('checked'))topics.push(el.dataset.topic)});if(!topics.length){showToast('Выберите темы');return}const note=document.getElementById('inst-note').value.trim();if(editId){const idx=data.instructions.findIndex(i=>i.id==editId);if(idx!==-1)data.instructions[idx]={...data.instructions[idx],name,topics,note};cancelInstEdit();showToast('✅ Обновлено')}else{data.instructions.push({id:Date.now(),name,topics,note,time:now()});showToast('🎓 Сохранено')}saveData(data);document.getElementById('inst-name').value='';document.getElementById('inst-note').value='';document.querySelectorAll('#tab-inst .check-item[data-topic]').forEach(el=>el.classList.remove('checked'));renderInstructions()}
+function cancelInstEdit(){document.getElementById('inst-edit-id').value='';document.getElementById('inst-save-btn').textContent='Сохранить';document.getElementById('inst-cancel-btn').style.display='none';document.getElementById('inst-name').value='';document.getElementById('inst-note').value='';document.querySelectorAll('#tab-inst .check-item[data-topic]').forEach(el=>el.classList.remove('checked'))}
+function editInst(id){const r=data.instructions.find(i=>i.id==id);if(!r)return;document.getElementById('inst-edit-id').value=r.id;document.getElementById('inst-name').value=r.name||'';document.getElementById('inst-note').value=r.note||'';document.querySelectorAll('#tab-inst .check-item[data-topic]').forEach(el=>el.classList.toggle('checked',r.topics.includes(el.dataset.topic)));document.getElementById('inst-save-btn').textContent='Обновить';document.getElementById('inst-cancel-btn').style.display='block';document.getElementById('content').scrollTop=0}
+function deleteInst(id){if(!confirm('Удалить?'))return;data.instructions=data.instructions.filter(i=>i.id!=id);saveData(data);renderInstructions();showToast('🗑 Удалено')}
+function renderInstructions(){renderRosterChips('inst');const list=document.getElementById('inst-list');if(!data.instructions.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">🎓</div><p>Инструктажей нет</p></div>';return}list.innerHTML=[...data.instructions].reverse().map(r=>'<div class="record-item"><div class="record-header"><div class="record-id">'+r.name+'</div><div class="record-time">'+r.time+'</div></div><div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px">'+r.topics.map(t=>'<span class="status-badge badge-ok">'+t+'</span>').join('')+'</div>'+(r.note?'<div class="record-comment">'+r.note+'</div>':'')+'<div class="record-actions"><button class="action-btn action-edit" onclick="editInst('+r.id+')">✏️ Изменить</button><button class="action-btn action-del" onclick="deleteInst('+r.id+')">🗑 Удалить</button></div></div>').join('')}
+
+function buildReportHTML(src){
+  const d=src||data,date=d.shift.reportDate||new Date().toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'}),
+  zL=['Мусор убран','Продукты промаркированы','Сумки не на улице','Раздевалка в порядке','Зона готова к работе'],
+  B={ok:['#D1FAE5','#065F46','✅ Норма'],warn:['#FEF3C7','#92400E','⚠️ Замечание'],fix:['#FEE2E2','#991B1B','🔧 Ремонт']};
+  const skName=d.shift.name||'—',zone=d.shift.zone||'—',startT=d.shift.startTime||'—',endT=d.shift.endTime;
+  let h='<div style="font-family:-apple-system,sans-serif;color:#111;max-width:600px">';
+  h+='<h2 style="font-size:18px;font-weight:700;margin-bottom:6px">📊 Отчёт старшего курьера</h2>';
+  h+='<div style="background:#F0F9FF;border-radius:12px;padding:12px 14px;margin-bottom:20px;font-size:13px;line-height:1.8">';
+  h+='👤 <b>'+skName+'</b> &nbsp;|&nbsp; 📍 '+zone+'<br>';
+  h+='📅 '+date+' &nbsp;|&nbsp; ⏱ '+startT+(endT?' – '+endT:'')+'</div>';
+  const roster=d.roster||[];
+  if(roster.length){const pres=roster.filter(m=>m.present).length;
+    h+='<div style="margin-bottom:20px"><div style="font-size:14px;font-weight:700;border-bottom:2px solid #E5E5EA;padding-bottom:6px;margin-bottom:12px">👥 Команда — '+pres+'/'+roster.length+' на смене</div>';
+    h+=roster.map(m=>'<div style="font-size:13px;margin-bottom:4px">'+(m.present?'✅':'⚪')+' '+m.name+(m.courierId&&m.courierId!==m.name?' <span style="color:#8E8E93">· '+m.courierId+'</span>':'')+'</div>').join('');
+    h+='</div>';}
+  h+='<div style="margin-bottom:20px"><div style="font-size:14px;font-weight:700;border-bottom:2px solid #E5E5EA;padding-bottom:6px;margin-bottom:12px">🚲 Техника — '+d.tech.length+'</div>';
+  if(d.tech.length){d.tech.forEach(r=>{const[bg,col,lbl]=B[r.status]||B.ok,title=[r.type,r.qr,r.num].filter(Boolean).join(' · ')||'—',ph=(r.photos||[]).filter(Boolean);h+='<div style="margin-bottom:12px;padding:12px;background:'+(r.urgent?'#FDE6E4':'#F7F7F9')+';border-radius:12px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:600">'+(r.urgent?'🚨 ':'')+title+'</span><span style="font-size:11px;color:#8E8E93">'+r.time+'</span></div><span style="background:'+bg+';color:'+col+';padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600">'+lbl+'</span>'+(r.comment?'<div style="font-size:13px;color:#555;margin-top:6px">'+r.comment+'</div>':'')+(ph.length?'<div style="display:flex;gap:8px;margin-top:8px">'+ph.map(p=>'<img src="'+p+'" style="width:120px;height:90px;object-fit:cover;border-radius:8px">').join('')+'</div>':'')+'</div>'})}else{h+='<div style="font-size:13px;color:#8E8E93">Нет записей</div>'}
+  h+='</div>';
+  const bOk=d.batteries.filter(b=>b.status==='ok').length,bW=d.batteries.filter(b=>b.status==='weak').length,bB=d.batteries.filter(b=>b.status==='broken').length;
+  h+='<div style="margin-bottom:20px"><div style="font-size:14px;font-weight:700;border-bottom:2px solid #E5E5EA;padding-bottom:6px;margin-bottom:12px">🔋 Батареи — '+d.batteries.length+'</div><div style="font-size:13px;margin-bottom:10px">✅ '+bOk+' &nbsp;⚠️ '+bW+' &nbsp;❌ '+bB+'</div>';
+  d.batteries.filter(b=>b.status!=='ok').forEach(b=>{const ph=(b.photos||[]).filter(Boolean);h+='<div style="margin-bottom:10px;padding:10px;background:#F7F7F9;border-radius:10px"><span style="font-weight:600">🔋 '+b.num+'</span> '+(b.status==='weak'?'<span style="background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:12px;font-size:11px">⚠️ Слабая</span>':'')+(b.status==='broken'?'<span style="background:#FEE2E2;color:#991B1B;padding:2px 8px;border-radius:12px;font-size:11px">❌ Сломана</span>':'')+(ph.length?'<div style="display:flex;gap:8px;margin-top:8px">'+ph.map(p=>'<img src="'+p+'" style="width:120px;height:90px;object-fit:cover;border-radius:8px">').join('')+'</div>':'')+'</div>'});
+  h+='</div>';
+  const zC=d.zone.checks.filter(Boolean).length,bags=d.zone.bags,zPh=(d.zone.photos||[]).filter(Boolean);
+  h+='<div style="margin-bottom:20px"><div style="font-size:14px;font-weight:700;border-bottom:2px solid #E5E5EA;padding-bottom:6px;margin-bottom:12px">🗂 Зона — '+zC+'/5</div><div style="font-size:13px;margin-bottom:8px">'+d.zone.checks.map((c,i)=>'<div>'+(c?'✅':'❌')+' '+zL[i]+'</div>').join('')+'</div><div style="font-size:13px;margin-bottom:8px">📦 Всего: '+(bags.total||0)+', выдано: '+(bags.issued||0)+', повреждено: '+(bags.damaged||0)+'</div>'+(d.zone.comment?'<div style="font-size:13px;color:#555;margin-bottom:8px">'+d.zone.comment+'</div>':'')+(zPh.length?'<div style="display:flex;gap:8px;margin-top:8px">'+zPh.map(p=>'<img src="'+p+'" style="width:120px;height:90px;object-fit:cover;border-radius:8px">').join('')+'</div>':'')+'</div>';
+  h+='<div style="margin-bottom:20px"><div style="font-size:14px;font-weight:700;border-bottom:2px solid #E5E5EA;padding-bottom:6px;margin-bottom:12px">⚠️ Нарушения — '+d.violations.length+'</div>';
+  if(d.violations.length){d.violations.forEach((v,i)=>{const ph=(v.photos||[]).filter(Boolean);h+='<div style="margin-bottom:10px;padding:10px;background:#FEF2F2;border-radius:10px">'+(v.urgent?'<div style="display:inline-block;background:#FA3E2C;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;margin-bottom:5px">🚨 СРОЧНО</div>':'')+'<div style="font-weight:600;font-size:13px">'+(i+1)+'. '+v.courierId+(v.name?' · '+v.name:'')+' <span style="background:#FEE2E2;color:#991B1B;padding:2px 8px;border-radius:12px;font-size:11px">'+v.type+'</span></div>'+(v.desc?'<div style="font-size:13px;color:#555;margin-top:4px">'+v.desc+'</div>':'')+(ph.length?'<div style="display:flex;gap:8px;margin-top:8px">'+ph.map(p=>'<img src="'+p+'" style="width:120px;height:90px;object-fit:cover;border-radius:8px">').join('')+'</div>':'')+'<div style="font-size:11px;color:#8E8E93;margin-top:4px">'+v.time+'</div></div>'})}else{h+='<div style="font-size:13px;color:#8E8E93">Нет</div>'}
+  h+='</div>';
+  h+='<div style="margin-bottom:20px"><div style="font-size:14px;font-weight:700;border-bottom:2px solid #E5E5EA;padding-bottom:6px;margin-bottom:12px">🎓 Инструктажи — '+d.instructions.length+'</div>';
+  if(d.instructions.length){d.instructions.forEach((ins,i)=>{h+='<div style="margin-bottom:10px;padding:10px;background:#F0FDF4;border-radius:10px"><div style="font-weight:600;font-size:13px">'+(i+1)+'. '+ins.name+'</div><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">'+ins.topics.map(t=>'<span style="background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:12px;font-size:11px">'+t+'</span>').join('')+'</div>'+(ins.note?'<div style="font-size:13px;color:#555;margin-top:4px">'+ins.note+'</div>':'')+'<div style="font-size:11px;color:#8E8E93;margin-top:4px">'+ins.time+'</div></div>'})}else{h+='<div style="font-size:13px;color:#8E8E93">Нет</div>'}
+  h+='</div>';
+  h+='<div style="font-size:11px;color:#8E8E93;text-align:center;padding-top:10px;border-top:1px solid #E5E5EA">Сформировано · '+date+'</div></div>';
+  return h;
+}
+
+function buildReportText(src){
+  const d=src||data,date=d.shift.reportDate||new Date().toLocaleDateString('ru-RU'),
+  zL=['Мусор убран','Продукты промаркированы','Сумки не на улице','Раздевалка в порядке','Зона готова к работе'];
+  const sk=d.shift.name||'—',zone=d.shift.zone||'—',st=d.shift.startTime||'—',et=d.shift.endTime;
+  let t='📊 ОТЧЁТ СТАРШЕГО КУРЬЕРА\n';
+  t+='👤 '+sk+' | 📍 '+zone+'\n';
+  t+='📅 '+date+' | ⏱ '+st+(et?' – '+et:'')+'\n\n';
+  const roster=d.roster||[];
+  if(roster.length){const pres=roster.filter(m=>m.present).length;
+    t+='👥 КОМАНДА — '+pres+'/'+roster.length+' на смене\n';
+    roster.forEach(m=>{t+='  '+(m.present?'✅':'⚪')+' '+m.name+(m.courierId&&m.courierId!==m.name?' ('+m.courierId+')':'')+'\n'});
+    t+='\n';}
+  t+='🚲 ТЕХНИКА — '+d.tech.length+' ед.\n';
+  if(d.tech.length){d.tech.forEach(r=>{const title=[r.type,r.qr,r.num].filter(Boolean).join(' · ')||'—';const lbl={ok:'✅ Норма',warn:'⚠️ Замечание',fix:'🔧 Ремонт'}[r.status]||'';t+='  '+(r.urgent?'🚨 ':'')+title+' — '+lbl+(r.comment?' ('+r.comment+')':'')+' '+r.time+'\n'})}else{t+='  Нет записей\n'}
+  const bOk=d.batteries.filter(b=>b.status==='ok').length,bW=d.batteries.filter(b=>b.status==='weak').length,bB=d.batteries.filter(b=>b.status==='broken').length;
+  t+='\n🔋 БАТАРЕИ — '+d.batteries.length+' шт.\n';
+  t+='  ✅ '+bOk+' норма / ⚠️ '+bW+' слабых / ❌ '+bB+' сломано\n';
+  d.batteries.filter(b=>b.status!=='ok').forEach(b=>t+='  Батарея '+b.num+': '+(b.status==='weak'?'⚠️ Слабая':'❌ Сломана')+'\n');
+  const zC=d.zone.checks.filter(Boolean).length,bags=d.zone.bags;
+  t+='\n🗂 ЗОНА — '+zC+'/5\n';
+  d.zone.checks.forEach((c,i)=>t+='  '+(c?'✅':'❌')+' '+zL[i]+'\n');
+  t+='  📦 Сумки: всего '+(bags.total||0)+', выдано '+(bags.issued||0)+', повреждено '+(bags.damaged||0)+'\n';
+  if(d.zone.comment)t+='  '+d.zone.comment+'\n';
+  t+='\n⚠️ НАРУШЕНИЯ — '+d.violations.length+'\n';
+  if(d.violations.length){d.violations.forEach((v,i)=>{t+='  '+(i+1)+'. '+(v.urgent?'🚨 ':'')+v.courierId+(v.name?' ('+v.name+')':'')+' | '+v.type+' | '+v.time+'\n';if(v.desc)t+='     '+v.desc+'\n'})}else{t+='  Нет\n'}
+  t+='\n🎓 ИНСТРУКТАЖИ — '+d.instructions.length+'\n';
+  if(d.instructions.length){d.instructions.forEach((ins,i)=>{t+='  '+(i+1)+'. '+ins.name+' — '+ins.topics.join(', ')+'\n';if(ins.note)t+='     '+ins.note+'\n'})}else{t+='  Нет\n'}
+  t+='\n— Старший курьер '+sk+(zone?' | '+zone:'');
+  return t;
+}
+
+function openReport(){const rb=document.getElementById('report-html');rb.innerHTML=buildReportHTML();rb.scrollTop=0;openModal('modal-report')}
+
+function shareReport(){
+  const text=buildReportText();
+  if(navigator.share){navigator.share({title:'Отчёт смены',text}).catch(()=>copyTextFallback(text))}
+  else{copyTextFallback(text)}
+}
+function copyTextFallback(text){
+  try{
+    if(navigator.clipboard){navigator.clipboard.writeText(text).then(()=>showToast('📋 Скопировано — вставьте в Telegram'))}
+    else{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('📋 Скопировано — вставьте в Telegram')}
+  }catch(e){showToast('⚠️ Не удалось скопировать')}
+}
+
+function downloadReport(){
+  const date=new Date().toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'}).replace(/\./g,'-');
+  const html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Отчёт '+date+'</title><style>body{font-family:-apple-system,sans-serif;padding:20px;max-width:600px;margin:0 auto}@media print{body{padding:0}}</style></head><body>'+buildReportHTML()+'</body></html>';
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='otchet-'+date+'.html';document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a)},1000);
+  showToast('💾 Файл сохранён');
+}
+
+function clearShift(){if(!confirm('Очистить смену БЕЗ сохранения в архив?'))return;const prevShift={...data.shift};const team=data.roster.map(m=>({...m,present:true}));data=defaultData();data.shift=prevShift;data.roster=team;data.shift.startTime=now();delete data.shift.endTime;delete data.shift.reportDate;saveData(data);renderHome();renderTechList();renderBatteries();renderZone();renderViolations();renderInstructions();closeModal('modal-report');showToast('🗑 Смена очищена')}
+
+/* ── АРХИВ СМЕН ── */
+function loadArchive(){try{return JSON.parse(localStorage.getItem('sc_archive'))||[]}catch(e){return[]}}
+function saveArchive(arr){try{localStorage.setItem('sc_archive',JSON.stringify(arr));return true}catch(e){showToast('⚠️ Архив переполнен');return false}}
+function stripPhotos(d){
+  const c=JSON.parse(JSON.stringify(d));
+  (c.tech||[]).forEach(t=>{delete t.photos});
+  (c.batteries||[]).forEach(b=>{delete b.photos});
+  if(c.zone)delete c.zone.photos;
+  (c.violations||[]).forEach(v=>{delete v.photos});
+  return c;
+}
+function shiftIsEmpty(){return !data.tech.length&&!data.batteries.length&&!data.violations.length&&!data.instructions.length&&!data.roster.length&&!data.zone.checks.some(Boolean)&&!data.zone.bags.total&&!data.zone.comment}
+function archiveShift(){
+  if(shiftIsEmpty()){showToast('Смена пустая — нечего сохранять');return}
+  const snap=stripPhotos(data);
+  snap.shift={...snap.shift,endTime:now(),reportDate:new Date().toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'})};
+  const arch=loadArchive();
+  arch.push({id:Date.now(),savedAt:Date.now(),data:snap});
+  if(!saveArchive(arch))return;
+  const prevShift={name:data.shift.name,zone:data.shift.zone,startTime:now()};
+  const team=data.roster.map(m=>({...m,present:true}));
+  data=defaultData();data.shift=prevShift;data.roster=team;saveData(data);
+  renderHome();renderTechList();renderBatteries();renderZone();renderViolations();renderInstructions();
+  closeModal('modal-report');showToast('✅ Смена сохранена в архив');
+}
+function archiveSummary(d){
+  const t=(d.tech||[]).length,bBad=(d.batteries||[]).filter(b=>b.status!=='ok').length,v=(d.violations||[]).length,i=(d.instructions||[]).length;
+  const parts=[];if(t)parts.push('🚲 '+t);if(bBad)parts.push('🔋 '+bBad);if(v)parts.push('⚠️ '+v);if(i)parts.push('🎓 '+i);
+  return parts.length?parts.join(' · '):'пусто';
+}
+function renderArchiveCard(){
+  const arch=loadArchive(),card=document.getElementById('archive-card');
+  if(!card)return;
+  if(!arch.length){card.style.display='none';return}
+  card.style.display='block';
+  const recent=[...arch].reverse().slice(0,3);
+  card.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div class="section-label" style="margin:0">История смен · '+arch.length+'</div><button class="changelog-btn" onclick="openArchive()">Все смены ›</button></div>'+
+    recent.map((a,i)=>{const d=a.data,zone=d.shift.zone||'без зоны',bb=i<recent.length-1?'border-bottom:1px solid var(--border-soft)':'';return '<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;'+bb+';cursor:pointer" onclick="viewArchived('+a.id+')"><div><div style="font-weight:700;font-size:14px">'+d.shift.reportDate+'</div><div style="font-size:12px;color:var(--text-sec);margin-top:2px">'+zone+' · '+archiveSummary(d)+'</div></div><div style="color:var(--text-ter);font-size:18px">›</div></div>'}).join('');
+}
+function openArchive(){renderArchiveList();openModal('modal-archive')}
+function renderArchiveList(){
+  const arch=loadArchive(),list=document.getElementById('archive-list');
+  if(!arch.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">📚</div><p>Архив пуст</p></div>';return}
+  list.innerHTML=[...arch].reverse().map(a=>{const d=a.data,zone=d.shift.zone||'без зоны',name=d.shift.name||'—';
+    return '<div class="record-item" style="cursor:pointer" onclick="viewArchived('+a.id+')"><div class="record-header"><div class="record-id">'+d.shift.reportDate+'</div><div class="record-time">'+(d.shift.startTime||'')+(d.shift.endTime?'–'+d.shift.endTime:'')+'</div></div><div style="font-size:13px;color:var(--text-sec)">👤 '+name+' · 📍 '+zone+'</div><div style="font-size:13px;color:var(--text-sec);margin-top:4px">'+archiveSummary(d)+'</div><div class="record-actions"><button class="action-btn action-edit" onclick="event.stopPropagation();viewArchived('+a.id+')">👁 Открыть</button><button class="action-btn action-del" onclick="event.stopPropagation();deleteArchived('+a.id+')">🗑 Удалить</button></div></div>'}).join('');
+}
+let viewingArchiveId=null;
+function viewArchived(id){
+  const a=loadArchive().find(x=>x.id==id);if(!a)return;
+  viewingArchiveId=id;
+  const av=document.getElementById('archive-view-html');av.innerHTML=buildReportHTML(a.data);av.scrollTop=0;
+  closeModal('modal-archive');openModal('modal-archive-view');
+}
+function shareArchived(){const a=loadArchive().find(x=>x.id==viewingArchiveId);if(!a)return;const text=buildReportText(a.data);if(navigator.share){navigator.share({title:'Отчёт смены',text}).catch(()=>copyTextFallback(text))}else copyTextFallback(text)}
+function downloadArchived(){const a=loadArchive().find(x=>x.id==viewingArchiveId);if(!a)return;const date=(a.data.shift.reportDate||'').replace(/\./g,'-');const html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Отчёт '+date+'</title><style>body{font-family:-apple-system,sans-serif;padding:20px;max-width:600px;margin:0 auto}</style></head><body>'+buildReportHTML(a.data)+'</body></html>';const blob=new Blob([html],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),el=document.createElement('a');el.href=url;el.download='otchet-'+date+'.html';document.body.appendChild(el);el.click();setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(el)},1000);showToast('💾 Файл сохранён')}
+function deleteArchived(id){if(!confirm('Удалить смену из архива?'))return;const arch=loadArchive().filter(x=>x.id!=id);saveArchive(arch);renderArchiveList();renderArchiveCard();showToast('🗑 Удалено')}
+function deleteViewedArchive(){if(viewingArchiveId==null)return;if(!confirm('Удалить эту смену из архива?'))return;const arch=loadArchive().filter(x=>x.id!=viewingArchiveId);saveArchive(arch);closeModal('modal-archive-view');renderArchiveCard();showToast('🗑 Удалено')}
+
+/* ── АНАЛИТИКА ── */
+function allShiftsData(){const a=loadArchive().map(x=>x.data);a.push(data);return a}
+function computeAnalytics(){
+  const shifts=allShiftsData(),archivedCount=loadArchive().length;
+  const vMap={};
+  shifts.forEach(s=>(s.violations||[]).forEach(v=>{const k=v.courierId||'—';if(!vMap[k])vMap[k]={id:k,name:'',count:0,types:{}};vMap[k].count++;vMap[k].types[v.type]=(vMap[k].types[v.type]||0)+1;if(v.name&&!vMap[k].name)vMap[k].name=v.name}));
+  const violators=Object.values(vMap).sort((a,b)=>b.count-a.count);
+  const tMap={};
+  shifts.forEach(s=>(s.tech||[]).forEach(t=>{if(t.status==='ok')return;const k=t.qr||t.num||'—';if(!tMap[k])tMap[k]={id:k,type:t.type||'',count:0,comment:''};tMap[k].count++;if(t.comment)tMap[k].comment=t.comment}));
+  const techProblems=Object.values(tMap).sort((a,b)=>b.count-a.count);
+  let bOk=0,bWeak=0,bBroken=0;
+  shifts.forEach(s=>(s.batteries||[]).forEach(b=>{if(b.status==='ok')bOk++;else if(b.status==='weak')bWeak++;else if(b.status==='broken')bBroken++}));
+  const bTotal=bOk+bWeak+bBroken,defectRate=bTotal?Math.round((bWeak+bBroken)/bTotal*100):0;
+  const zoneTrend=[];
+  loadArchive().map(x=>x.data).forEach(s=>{if(s.zone&&s.zone.checks){const done=s.zone.checks.filter(Boolean).length;zoneTrend.push({date:(s.shift.reportDate||'').slice(0,5),pct:Math.round(done/5*100)})}});
+  const cur=data.zone.checks.filter(Boolean).length;if(cur)zoneTrend.push({date:'сейчас',pct:Math.round(cur/5*100)});
+  const zoneAvg=zoneTrend.length?Math.round(zoneTrend.reduce((a,z)=>a+z.pct,0)/zoneTrend.length):0;
+  let totViol=0,totInst=0,totTechIssues=0;
+  shifts.forEach(s=>{totViol+=(s.violations||[]).length;totInst+=(s.instructions||[]).length;totTechIssues+=(s.tech||[]).filter(t=>t.status!=='ok').length});
+  return {archivedCount,violators,techProblems,bOk,bWeak,bBroken,bTotal,defectRate,zoneTrend:zoneTrend.slice(-7),zoneAvg,totViol,totInst,totTechIssues,shiftsTotal:archivedCount+(shiftIsEmpty()?0:1)};
+}
+function analyticsVerdicts(a){
+  const out=[];
+  const repV=a.violators.filter(v=>v.count>=2);
+  if(repV.length){const v=repV[0];out.push({tone:'bad',text:'⚠️ '+v.id+(v.name?' ('+v.name+')':'')+' нарушал '+v.count+' раз. Стоит поговорить или оформить.'})}
+  const repT=a.techProblems.filter(t=>t.count>=2);
+  if(repT.length){const t=repT[0];out.push({tone:'bad',text:'🔧 '+t.id+' ломается часто ('+t.count+'×). Пора в ремонт.'})}
+  if(a.bTotal){if(a.defectRate>=20)out.push({tone:'bad',text:'🔋 Много бракованных батарей — '+a.defectRate+'%. Сообщи на склад.'});else out.push({tone:'ok',text:'🔋 С батареями порядок — брака '+a.defectRate+'%.'})}
+  if(a.zoneTrend.length){if(a.zoneAvg>=80)out.push({tone:'ok',text:'🗂 Зону готовишь хорошо — в среднем '+a.zoneAvg+'%.'});else if(a.zoneAvg>=50)out.push({tone:'warn',text:'🗂 Готовность зоны средняя — '+a.zoneAvg+'%. Есть куда подтянуть.'});else out.push({tone:'bad',text:'🗂 Зона часто не готова — '+a.zoneAvg+'%. Обрати внимание.'})}
+  if(!out.length)out.push({tone:'ok',text:'✅ Всё спокойно: повторов нарушений и поломок нет.'});
+  return out;
+}
+function renderAnalytics(){
+  const a=computeAnalytics(),box=document.getElementById('analytics-body');
+  if(a.shiftsTotal===0){box.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>Пока нет данных.<br>Закрой хотя бы одну смену в архив.</p></div>';return}
+  let h='';
+  h+='<div class="an-card"><div class="section-label">Главное</div>'+analyticsVerdicts(a).map(v=>'<div class="vd vd-'+v.tone+'">'+v.text+'</div>').join('')+'</div>';
+  h+='<div class="section-label" style="margin:4px 2px 10px">Подробности</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">';
+  h+=metricBox(a.shiftsTotal,'Смен учтено')+metricBox(a.totViol,'Нарушений')+metricBox(a.totTechIssues,'Поломок техники')+metricBox(a.totInst,'Инструктажей');
+  h+='</div>';
+  h+='<div class="an-card"><div class="section-label">⚠️ Повторные нарушители</div>';
+  if(a.violators.length){h+=a.violators.slice(0,6).map((v,i)=>{const types=Object.keys(v.types).join(', '),rep=v.count>=2;return '<div class="an-row"><div style="min-width:0"><div style="font-weight:700;font-size:14px">'+(i+1)+'. '+v.id+(v.name?' · '+v.name:'')+'</div><div style="font-size:12px;color:var(--text-sec);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+types+'</div></div><span class="an-count '+(rep?'an-count-bad':'')+'">'+v.count+(rep?' ✕':'')+'</span></div>'}).join('');}else h+='<div class="an-empty">Нарушений нет</div>';
+  h+='</div>';
+  h+='<div class="an-card"><div class="section-label">🔧 Проблемная техника</div>';
+  if(a.techProblems.length){h+=a.techProblems.slice(0,6).map((t,i)=>{const rep=t.count>=2;return '<div class="an-row"><div style="min-width:0"><div style="font-weight:700;font-size:14px">'+(i+1)+'. '+t.id+(t.type?' · '+t.type:'')+'</div>'+(t.comment?'<div style="font-size:12px;color:var(--text-sec);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+t.comment+'</div>':'')+'</div><span class="an-count '+(rep?'an-count-bad':'')+'">'+t.count+'×</span></div>'}).join('');}else h+='<div class="an-empty">Поломок нет</div>';
+  h+='</div>';
+  h+='<div class="an-card"><div class="section-label">🔋 Брак батарей</div>';
+  if(a.bTotal){const okP=Math.round(a.bOk/a.bTotal*100),wP=Math.round(a.bWeak/a.bTotal*100),brP=100-okP-wP;
+    h+='<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px"><span style="font-size:32px;font-weight:800;letter-spacing:-1px;color:'+(a.defectRate>=20?'var(--danger)':'var(--text)')+'">'+a.defectRate+'%</span><span style="font-size:13px;color:var(--text-sec)">брака из '+a.bTotal+' батарей</span></div>';
+    h+='<div style="display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--card2)">'+(okP?'<div style="width:'+okP+'%;background:#1FBF5A"></div>':'')+(wP?'<div style="width:'+wP+'%;background:#F5A623"></div>':'')+(brP>0?'<div style="width:'+brP+'%;background:#FA3E2C"></div>':'')+'</div>';
+    h+='<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-sec);margin-top:8px"><span>✅ '+a.bOk+'</span><span>⚠️ '+a.bWeak+'</span><span>❌ '+a.bBroken+'</span></div>';
+  }else h+='<div class="an-empty">Батареи не учитывались</div>';
+  h+='</div>';
+  h+='<div class="an-card"><div class="section-label">🗂 Готовность зоны · в среднем '+a.zoneAvg+'%</div>';
+  if(a.zoneTrend.length){h+='<div style="display:flex;align-items:flex-end;gap:6px;height:90px;margin-top:4px">'+a.zoneTrend.map(z=>'<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div style="font-size:10px;color:var(--text-sec);margin-bottom:3px">'+z.pct+'</div><div style="width:100%;height:'+Math.max(z.pct,4)+'%;background:var(--accent);border-radius:5px 5px 0 0"></div><div style="font-size:9px;color:var(--text-ter);margin-top:4px;white-space:nowrap">'+z.date+'</div></div>').join('')+'</div>';}else h+='<div class="an-empty">Зона не заполнялась</div>';
+  h+='</div>';
+  box.innerHTML=h;
+}
+function metricBox(val,lbl){return '<div style="background:var(--card);border-radius:16px;padding:14px 16px"><div style="font-size:28px;font-weight:800;letter-spacing:-1px;line-height:1">'+val+'</div><div style="font-size:12px;color:var(--text-sec);margin-top:4px;font-weight:600">'+lbl+'</div></div>'}
+function openAnalytics(){renderAnalytics();document.getElementById('analytics-body').scrollTop=0;openModal('modal-analytics')}
+
+renderHome();
+</script>
+</body>
+</html>
